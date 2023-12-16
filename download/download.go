@@ -50,16 +50,19 @@ func Download(fileName string) error {
 		return err
 	}
 
+	log.Printf("Prepare Download Files %d ... \n", len(dUrls))
+
 	var wg sync.WaitGroup
 
 	wg.Add(len(dUrls))
 	for i, dUrl := range dUrls {
-		out := filepath.Join(dirName, fmt.Sprintf("%03d", i))
+		out := filepath.Join(dirName, fmt.Sprintf("%03d", i+1))
+		percent := fmt.Sprintf("% 4d %03d (%3d)", i+1, i+1, len(dUrls))
 		if len(dUrls) > 1000 {
-			out = filepath.Join(dirName, fmt.Sprintf("%04d", i))
+			out = filepath.Join(dirName, fmt.Sprintf("%04d", i+1))
+			percent = fmt.Sprintf("% 5d %04d (%4d)", i+1, i+1, len(dUrls))
 		}
-		
-		percent := fmt.Sprintf("% 4d (% 4d)", i, len(dUrls))
+
 		go download(&wg, dUrl, out, percent)
 	}
 
@@ -71,16 +74,13 @@ func Download(fileName string) error {
 func download(wg *sync.WaitGroup, dUrl, out, percent string) {
 	defer wg.Done()
 
-	if strings.Contains(dUrl, ".png?") {
-		out = fmt.Sprintf("%s.png", out)
-	} else if strings.Contains(dUrl, ".jpeg?") {
-		out = fmt.Sprintf("%s.jpeg", out)
-	} else if strings.Contains(dUrl, ".jpg?") {
-		out = fmt.Sprintf("%s.jpg", out)
-	} else {
-		log.Fatalf("unknown file type %s \n", dUrl)
+	ext, err := parseExt(dUrl)
+	if err != nil {
+		log.Fatalf("%s \n", err.Error())
 	}
+	out = fmt.Sprintf("%s.%s", out, ext)
 
+	http.DefaultClient.Timeout = 0
 	resp, err := http.Get(dUrl)
 	if err != nil {
 		log.Fatalf("http.Get Failure :: %s \n", err.Error())
