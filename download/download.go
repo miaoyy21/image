@@ -72,7 +72,6 @@ func download(dUrl, out, percent string) {
 	}
 	out = fmt.Sprintf("%s.%s", out, ext)
 
-	http.DefaultClient.Timeout = 0
 	resp, err := http.Get(dUrl)
 	if err != nil {
 		log.Fatalf("http.Get Failure :: %s \n", err.Error())
