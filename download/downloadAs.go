@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func DownloadAs(fileName string) error {
+func DownloadText(fileName string) error {
 	srcFile, err := os.Open(fileName)
 	if err != nil {
 		return err
@@ -27,21 +27,17 @@ func DownloadAs(fileName string) error {
 
 	// 打开文件以追加模式写入
 	target := filepath.Join(dirName, "TODO.txt")
-	dstFile, err := os.OpenFile(target, os.O_APPEND|os.O_TRUNC|os.O_RDWR, 0644)
+	dstFile, err := os.OpenFile(target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return err
+		return fmt.Errorf("os.OpenFile Failure :: %s", err)
 	}
 	defer dstFile.Close()
-
-	// 创建一个 Writer 对象，将内容逐行写入文件
-
-	// 刷新缓冲区并检查错误
 
 	fmt.Println("文件追加写入成功")
 
 	index := 0
 	scanner := bufio.NewScanner(srcFile)
-	writer := bufio.NewWriter(srcFile)
+	writer := bufio.NewWriter(dstFile)
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -60,19 +56,19 @@ func DownloadAs(fileName string) error {
 		}
 
 		index++
-		text := fmt.Sprintf("curl %s -o %04d.%s", dUrl, index, ext)
+		text := fmt.Sprintf("curl %s --output %04d.%s", dUrl, index, ext)
 		if _, err := fmt.Fprintln(writer, text); err != nil {
-			return err
+			return fmt.Errorf("fmt.Fprintln Failure :: %s", err)
 		}
 	}
 
 	// 检查是否有错误发生
 	if err := scanner.Err(); err != nil {
-		return err
+		return fmt.Errorf("scanner.Err Failure :: %s", err)
 	}
 
 	if err = writer.Flush(); err != nil {
-		return err
+		return fmt.Errorf("writer.Flush Failure :: %s", err)
 	}
 
 	log.Printf("Setting Download File Finished , Totals %d ... \n", index)

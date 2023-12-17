@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 )
 
 func Download(fileName string) error {
@@ -52,9 +51,6 @@ func Download(fileName string) error {
 
 	log.Printf("Prepare Download Files %d ... \n", len(dUrls))
 
-	var wg sync.WaitGroup
-
-	wg.Add(len(dUrls))
 	for i, dUrl := range dUrls {
 		out := filepath.Join(dirName, fmt.Sprintf("%03d", i+1))
 		percent := fmt.Sprintf("% 4d %03d (%3d)", i+1, i+1, len(dUrls))
@@ -63,17 +59,13 @@ func Download(fileName string) error {
 			percent = fmt.Sprintf("% 5d %04d (%4d)", i+1, i+1, len(dUrls))
 		}
 
-		go download(&wg, dUrl, out, percent)
+		download(dUrl, out, percent)
 	}
-
-	wg.Wait()
 
 	return nil
 }
 
-func download(wg *sync.WaitGroup, dUrl, out, percent string) {
-	defer wg.Done()
-
+func download(dUrl, out, percent string) {
 	ext, err := parseExt(dUrl)
 	if err != nil {
 		log.Fatalf("%s \n", err.Error())

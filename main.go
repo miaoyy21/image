@@ -13,7 +13,7 @@ var sDir string
 
 func init() {
 	flag.StringVar(&sMode, "m", "download", "使用模式：[download]自动下载图片；[swap]自动换脸")
-	flag.StringVar(&sFile, "f", "/Users/miaojingyi/Documents/media/women/002", "需要自动下载的文件")
+	flag.StringVar(&sFile, "f", "/Users/miaojingyi/Documents/media/women/001", "需要自动下载的文件")
 	flag.StringVar(&sDir, "d", "", "需要自动换脸的文件目录")
 
 	flag.Parse()
