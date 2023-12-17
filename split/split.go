@@ -43,8 +43,12 @@ func split(path string, f os.FileInfo, err error) error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
+
 		line = strings.ReplaceAll(line, "《", "")
 		line = strings.ReplaceAll(line, "》", "")
+		line = strings.ReplaceAll(line, "女性", "女人")
+		line = strings.ReplaceAll(line, "男性", "男人")
+
 		if len(line) < 1 {
 			continue
 		}

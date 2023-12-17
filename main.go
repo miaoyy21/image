@@ -5,7 +5,6 @@ import (
 	"log"
 	"x/download"
 	"x/split"
-	"x/swap"
 )
 
 var sMode string
@@ -44,15 +43,17 @@ func main() {
 			log.Fatalf("Split Failure :: %s \n", err.Error())
 		}
 	case "swap":
-		if len(sDir) < 1 {
-			log.Println("需要指定自动换脸的文件目录")
-			flag.Usage()
-			return
-		}
+		flag.Usage()
 
-		if err := swap.Swap(sFile); err != nil {
-			log.Fatalf("Swap Failure :: %s \n", err.Error())
-		}
+		//if len(sDir) < 1 {
+		//	log.Println("需要指定自动换脸的文件目录")
+		//	flag.Usage()
+		//	return
+		//}
+		//
+		//if err := swap.Swap(sFile); err != nil {
+		//	log.Fatalf("Swap Failure :: %s \n", err.Error())
+		//}
 	default:
 		flag.Usage()
 	}
