@@ -41,6 +41,7 @@ func Download(fileName string) error {
 		}
 
 		dUrl := line[6 : len(line)-3]
+		dUrl = strings.Split(dUrl, "?")[0]
 		dUrls = append(dUrls, dUrl)
 	}
 
@@ -60,6 +61,34 @@ func Download(fileName string) error {
 		}
 
 		download(dUrl, out, percent)
+		//if i+1 <= 1705 {
+		//	continue
+		//}
+		//
+		//if i+1 >= 2266 {
+		//	download(dUrl, out, percent)
+		//	continue
+		//}
+		//
+		//for k := 5; k <= 105; k++ {
+		//	ext, err := parseExt(dUrl)
+		//	if err != nil {
+		//		return err
+		//	}
+		//
+		//	newOut := filepath.Join(dirName, fmt.Sprintf("%03d", k), fmt.Sprintf("%04d.%s", i+1, ext))
+		//	if _, err := os.Stat(newOut); err != nil {
+		//		if os.IsNotExist(err) {
+		//			continue
+		//		}
+		//
+		//		fmt.Println(err.Error())
+		//		return err
+		//	}
+		//
+		//	newOut = strings.TrimRight(newOut, fmt.Sprintf(".%s", ext))
+		//	download(dUrl, newOut, percent)
+		//}
 	}
 
 	return nil

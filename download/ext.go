@@ -6,11 +6,11 @@ import (
 )
 
 func parseExt(s string) (string, error) {
-	if strings.Contains(s, ".png?") {
+	if strings.Contains(s, ".png") {
 		return "png", nil
-	} else if strings.Contains(s, ".jpeg?") {
+	} else if strings.Contains(s, ".jpeg") {
 		return "jpeg", nil
-	} else if strings.Contains(s, ".jpg?") {
+	} else if strings.Contains(s, ".jpg") {
 		return "jpg", nil
 	}
 
