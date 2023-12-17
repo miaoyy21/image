@@ -38,8 +38,7 @@ func split(path string, f os.FileInfo, err error) error {
 		return err
 	}
 
-	buf := new(bytes.Buffer)
-
+	lines, title, parse := make([]string, 0), "", strings.Repeat("=", 80)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -53,11 +52,16 @@ func split(path string, f os.FileInfo, err error) error {
 			continue
 		}
 
-		if buf.Len() == 0 {
-			if _, err := fmt.Fprintf(buf, "%s\n\n", line); err != nil {
-				return err
-			}
+		if strings.EqualFold(line, parse) {
+			break
+		}
 
+		if len(title) < 1 {
+			title = line
+			continue
+		}
+
+		if strings.EqualFold(line, strings.Repeat(">", len(parse))) {
 			continue
 		}
 
@@ -70,9 +74,7 @@ func split(path string, f os.FileInfo, err error) error {
 					continue
 				}
 
-				if _, err := fmt.Fprintf(buf, "%s\n", s0); err != nil {
-					return err
-				}
+				lines = append(lines, s0)
 			}
 		}
 	}
@@ -90,6 +92,35 @@ func split(path string, f os.FileInfo, err error) error {
 		return err
 	}
 	defer newFile.Close()
+
+	buf := new(bytes.Buffer)
+
+	// 写入标题
+	if _, err := fmt.Fprintf(buf, "%s \n", title); err != nil {
+		return err
+	}
+
+	// 写入分隔符
+	if _, err := fmt.Fprintf(buf, "%s \n", strings.Repeat(">", len(parse))); err != nil {
+		return err
+	}
+
+	// 写入每行
+	for _, line := range lines {
+		if _, err := fmt.Fprintf(buf, "%s， \n", line); err != nil {
+			return err
+		}
+	}
+
+	// 分隔符
+	if _, err := fmt.Fprintf(buf, "%s \n", parse); err != nil {
+		return err
+	}
+
+	// 全部行
+	if _, err := fmt.Fprintf(buf, "%s \n", strings.Join(lines, "，")); err != nil {
+		return err
+	}
 
 	if _, err := io.Copy(newFile, buf); err != nil {
 		return err
