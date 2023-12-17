@@ -41,7 +41,7 @@ func main() {
 		}
 
 		if err := split.Split(sDir); err != nil {
-			log.Fatalf("Download Failure :: %s \n", err.Error())
+			log.Fatalf("Split Failure :: %s \n", err.Error())
 		}
 	case "swap":
 		if len(sDir) < 1 {
