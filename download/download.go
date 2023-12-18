@@ -61,6 +61,7 @@ func Download(fileName string) error {
 		}
 
 		download(dUrl, out, percent)
+
 		//if i+1 <= 1705 {
 		//	continue
 		//}
