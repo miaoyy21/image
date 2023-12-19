@@ -5,6 +5,7 @@ import (
 	"log"
 	"x/download"
 	"x/split"
+	"x/srt"
 )
 
 var sMode string
@@ -12,9 +13,9 @@ var sFile string
 var sDir string
 
 func init() {
-	flag.StringVar(&sMode, "m", "download", "使用模式：[download]自动下载图片；[split]自动对文本按句分隔；[swap]自动换脸")
-	flag.StringVar(&sFile, "f", "/Users/miaojingyi/Documents/media/women/002", "需要自动下载的文件")
-	flag.StringVar(&sDir, "d", "", "需要自动换脸或替换的文件目录")
+	flag.StringVar(&sMode, "m", "srt", "使用模式：[download]自动下载图片；[split]自动对文本按句分隔；[srt]自动提取字幕文件")
+	flag.StringVar(&sFile, "f", "/Users/miaojingyi/Documents/media/short/Product/最强太子妃/最强太子妃 1.srt", "需要自动下载的文件或字幕文件")
+	flag.StringVar(&sDir, "d", "", "需要自动换替换的文件目录")
 
 	flag.Parse()
 }
@@ -42,18 +43,16 @@ func main() {
 		if err := split.Split(sDir); err != nil {
 			log.Fatalf("Split Failure :: %s \n", err.Error())
 		}
-	case "swap":
-		flag.Usage()
+	case "srt":
+		if len(sDir) < 1 {
+			log.Println("需要指定提取的字幕文件")
+			flag.Usage()
+			return
+		}
 
-		//if len(sDir) < 1 {
-		//	log.Println("需要指定自动换脸的文件目录")
-		//	flag.Usage()
-		//	return
-		//}
-		//
-		//if err := swap.Swap(sFile); err != nil {
-		//	log.Fatalf("Swap Failure :: %s \n", err.Error())
-		//}
+		if err := srt.Srt(sFile); err != nil {
+			log.Fatalf("Srt Failure :: %s \n", err.Error())
+		}
 	default:
 		flag.Usage()
 	}
