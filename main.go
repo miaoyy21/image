@@ -44,7 +44,7 @@ func main() {
 			log.Fatalf("Split Failure :: %s \n", err.Error())
 		}
 	case "srt":
-		if len(sDir) < 1 {
+		if len(sFile) < 1 {
 			log.Println("需要指定提取的字幕文件")
 			flag.Usage()
 			return
