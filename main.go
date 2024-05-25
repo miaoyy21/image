@@ -10,9 +10,18 @@ import (
 )
 
 func main() {
-	root := "assets"
+	// MP4 转为 GIF
+	if err := MP4ToGIF(); err != nil {
+		log.Printf("MP4ToGIF() Failure :: %s", err.Error())
+		return
+	}
 
-	if err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+	// 合并像素点
+
+}
+
+func MP4ToGIF() error {
+	return filepath.Walk("assets", func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -30,7 +39,5 @@ func main() {
 		}
 
 		return nil
-	}); err != nil {
-		log.Printf("filepath.Walk Failure :: %s", err.Error())
-	}
+	})
 }
