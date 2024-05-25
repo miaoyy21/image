@@ -77,7 +77,8 @@ func PNGToHD() error {
 			return err
 		}
 
-		srcImage, err := png.Decode(srcFile)
+		// 原始图像
+		srcImage, _, err := image.Decode(srcFile)
 		if err != nil {
 			return err
 		}
@@ -87,6 +88,15 @@ func PNGToHD() error {
 		}
 
 		bounds := srcImage.Bounds()
+
+		// 目标图像
+		dstImage := image.NewNRGBA(
+			image.Rectangle{
+				Min: image.Point{X: 0, Y: 0},
+				Max: image.Point{X: bounds.Dx() / 2, Y: bounds.Dy() / 2},
+			},
+		)
+
 		for x := 0; x < bounds.Dx(); x = x + 2 {
 			for y := 0; y < bounds.Dy(); y = y + 2 {
 				r1, g1, b1, a1 := srcImage.(*image.NRGBA).At(x, y).RGBA()
@@ -160,19 +170,8 @@ func PNGToHD() error {
 					}
 				}
 
-				newRGBA := color.RGBA{R: r, G: g, B: b, A: a}
-
-				srcImage.(*image.NRGBA).Set(x/2, y/2, newRGBA)
-			}
-		}
-		for x := 0; x < bounds.Dx(); x++ {
-			for y := 0; y < bounds.Dy(); y++ {
-				if x < bounds.Dx()/2 && y < bounds.Dy()/2 {
-					continue
-				}
-
-				newRGBA := color.RGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00}
-				srcImage.(*image.NRGBA).Set(x, y, newRGBA)
+				newRGBA := color.NRGBA{R: r, G: g, B: b, A: a}
+				dstImage.SetNRGBA(x/2, y/2, newRGBA)
 			}
 		}
 
@@ -182,7 +181,7 @@ func PNGToHD() error {
 			return err
 		}
 
-		if err := png.Encode(dstFile, srcImage); err != nil {
+		if err := png.Encode(dstFile, dstImage); err != nil {
 			return err
 		}
 
