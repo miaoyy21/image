@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"image"
+	"image/color"
+	"image/png"
+	"io"
 	"io/fs"
 	"log"
 	"os"
@@ -57,24 +59,34 @@ func PNGToHD() error {
 			return nil
 		}
 
-		originalFile, err := os.Open(path)
+		if strings.HasSuffix(strings.ToLower(path), "_src.png") || strings.HasSuffix(strings.ToLower(path), "_dst.png") {
+			return nil
+		}
+
+		// 拷贝1份原始文件
+		srcPath := strings.ReplaceAll(path, ".png", "_src.png")
+		if err := copyFile(path, srcPath); err != nil {
+			return err
+		}
+
+		srcFile, err := os.Open(srcPath)
 		if err != nil {
 			return err
 		}
 
-		originalImage, _, err := image.Decode(originalFile)
+		srcImage, err := png.Decode(srcFile)
 		if err != nil {
-			return fmt.Errorf("change Definition image.Decode [%s] : %s", path, err.Error())
-		}
-
-		if err := originalFile.Close(); err != nil {
 			return err
 		}
 
-		bounds := originalImage.Bounds()
-		log.Printf("%q : Width is %d,Height is %d \n", info.Name(), bounds.Dx(), bounds.Dy())
-		for x := 1; x < bounds.Dx()-1; x++ {
-			for y := 1; y < bounds.Dy()-1; y++ {
+		if err := srcFile.Close(); err != nil {
+			return err
+		}
+
+		bounds := srcImage.Bounds()
+		log.Printf("%q : Width is %d,Height is %d \n", path, bounds.Dx(), bounds.Dy())
+		for x := 0; x < bounds.Dx(); x++ {
+			for y := 0; y < bounds.Dy(); y++ {
 
 				//r1, g1, b1, a1 := originalImage.(*image.NRGBA).At(x-1, y-1).RGBA()
 				//r2, g2, b2, a2 := originalImage.(*image.NRGBA).At(x, y-1).RGBA()
@@ -108,30 +120,57 @@ func PNGToHD() error {
 				//	r, g, b, a = color.Transparent.RGBA()
 				//}
 				//
-				//newRGBA := color.RGBA{
-				//	R: uint8(r >> 8),
-				//	G: uint8(g >> 8),
-				//	B: uint8(b >> 8),
-				//	A: uint8(a >> 8),
-				//}
-				//
-				//originalImage.(*image.NRGBA).Set(x, y, newRGBA)
+				newRGBA := color.RGBA{
+					R: 255,
+					G: 0,
+					B: 0,
+					A: 255,
+				}
+
+				srcImage.(*image.NRGBA).Set(x, y, newRGBA)
 			}
 		}
 
-		//newFile, err := os.Create(path)
-		//if err != nil {
-		//	return fmt.Errorf("change Definition os.Create [%s] : %s", path, err.Error())
-		//}
-		//
-		//if err := png.Encode(newFile, originalImage); err != nil {
-		//	return fmt.Errorf("change Definition png.Encode [%s] : %s", path, err.Error())
-		//}
-		//
-		//if err := newFile.Close(); err != nil {
-		//	return err
-		//}
+		dstPath := strings.ReplaceAll(path, ".png", "_dst.png")
+		dstFile, err := os.Create(dstPath)
+		if err != nil {
+			return err
+		}
+
+		if err := png.Encode(dstFile, srcImage); err != nil {
+			return err
+		}
+
+		if err := dstFile.Close(); err != nil {
+			return err
+		}
 
 		return nil
 	})
+}
+
+func copyFile(src string, dst string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+
+	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		return err
+	}
+
+	if err := dstFile.Close(); err != nil {
+		return err
+	}
+
+	if err := srcFile.Close(); err != nil {
+		return err
+	}
+
+	return nil
 }
