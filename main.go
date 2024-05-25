@@ -1,59 +1,36 @@
 package main
 
 import (
-	"flag"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"io/fs"
 	"log"
-	"x/download"
-	"x/split"
-	"x/srt"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
-var sMode string
-var sFile string
-var sDir string
-
-func init() {
-	flag.StringVar(&sMode, "m", "srt", "使用模式：[download]自动下载图片；[split]自动对文本按句分隔；[srt]自动提取字幕文件")
-	flag.StringVar(&sFile, "f", "/Users/miaojingyi/Documents/media/short/Product/最强太子妃/最强太子妃 1.srt", "需要自动下载的文件或字幕文件")
-	flag.StringVar(&sDir, "d", "", "需要自动换替换的文件目录")
-
-	flag.Parse()
-}
-
 func main() {
+	root := "assets"
 
-	switch sMode {
-	case "download":
-		if len(sFile) < 1 {
-			log.Println("需要指定自动下载的文件")
-			flag.Usage()
-			return
+	if err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
 
-		if err := download.Download(sFile); err != nil {
-			log.Fatalf("Download Failure :: %s \n", err.Error())
-		}
-	case "split":
-		if len(sDir) < 1 {
-			log.Println("需要指定替换的的文件目录")
-			flag.Usage()
-			return
+		if !strings.EqualFold(filepath.Ext(path), ".mp4") {
+			return nil
 		}
 
-		if err := split.Split(sDir); err != nil {
-			log.Fatalf("Split Failure :: %s \n", err.Error())
-		}
-	case "srt":
-		if len(sFile) < 1 {
-			log.Println("需要指定提取的字幕文件")
-			flag.Usage()
-			return
+		// 1280*720 = 16:9 = 320*180
+		newName := strings.ReplaceAll(path, ".mp4", ".gif")
+		if _, err := os.ReadFile(newName); err != nil && os.IsNotExist(err) {
+			return ffmpeg.Input(path).
+				Output(newName, ffmpeg.KwArgs{"s": "1280x720" /*, "r": "24"*/}).
+				OverWriteOutput().ErrorToStdOut().Run()
 		}
 
-		if err := srt.Srt(sFile); err != nil {
-			log.Fatalf("Srt Failure :: %s \n", err.Error())
-		}
-	default:
-		flag.Usage()
+		return nil
+	}); err != nil {
+		log.Printf("filepath.Walk Failure :: %s", err.Error())
 	}
 }
