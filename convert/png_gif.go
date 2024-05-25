@@ -99,7 +99,7 @@ func PNGToGIF() error {
 				return err
 			}
 
-			log.Printf("GIF[ %s ] Dealing:: [ %d/%d ] ...\n", gifName, index, len(pngNames))
+			log.Printf("GIF[ %s ] Dealing:: [ %d/%d ] ...\n", gifName, index+1, len(pngNames))
 		}
 
 		gifFile, err := os.Create(gifName)
