@@ -13,10 +13,10 @@ func main() {
 	}
 
 	// 合并像素点
-	if err := convert.PNGToHD(); err != nil {
-		log.Printf("PNGToHD() Failure :: %s", err.Error())
-		return
-	}
+	//if err := convert.PNGToHD(); err != nil {
+	//	log.Printf("PNGToHD() Failure :: %s", err.Error())
+	//	return
+	//}
 
 	// 将 PNG 转为GIF
 	if err := convert.PNGToGIF(); err != nil {
