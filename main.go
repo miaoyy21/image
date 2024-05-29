@@ -24,8 +24,8 @@ func main() {
 	//	return
 	//}
 
-	if err := convert.RemoveBlue(); err != nil {
-		log.Printf("PNGToHD() Failure :: %s", err.Error())
+	if err := convert.RemoveBlack(); err != nil {
+		log.Printf("RemoveBlack() Failure :: %s", err.Error())
 		return
 	}
 

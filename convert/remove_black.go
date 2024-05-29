@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func RemoveBlue() error {
+func RemoveBlack() error {
 	return filepath.Walk("images", func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -56,7 +56,7 @@ func RemoveBlue() error {
 		for x := 0; x < bounds.Dx(); x++ {
 			for y := 0; y < bounds.Dy(); y++ {
 				r, g, b, a := orgImage.(*image.NRGBA).At(x, y).RGBA()
-				if b>>12 >= 12 && r>>12 <= 6 && g>>12 <= 6 {
+				if r>>12 <= 0 && g>>12 <= 0 && b>>12 <= 0 {
 					dstImage.SetNRGBA(x, y, color.NRGBA{R: 0, G: 0, B: 0, A: 0})
 				} else {
 					newRGBA := color.NRGBA{R: uint8(r >> 8), G: uint8(g >> 8), B: uint8(b >> 8), A: uint8(a >> 8)}
