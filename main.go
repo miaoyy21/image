@@ -24,7 +24,12 @@ func main() {
 	//	return
 	//}
 
-	if err := convert.RemoveBlack(); err != nil {
+	//if err := convert.RemoveBlack(); err != nil {
+	//	log.Printf("RemoveBlack() Failure :: %s", err.Error())
+	//	return
+	//}
+
+	if err := convert.RemoveAlpha(); err != nil {
 		log.Printf("RemoveBlack() Failure :: %s", err.Error())
 		return
 	}
